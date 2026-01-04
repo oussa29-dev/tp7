@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+//    id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.25"
+    id "jacoco"
+    id "org.sonarqube" version "4.4.1.3373"
+    id 'maven-publish'
+}
+
+group = 'com.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+cucumberReports {
+    outputDir = file('build/reports/cucumber.')
+    buildId = '0'
+reports = files('reports/example-report.json')
+}
+
+dependencies {
+    testImplementation 'io.cucumber:cucumber-java:6.0.0'
+    testImplementation 'io.cucumber:cucumber-junit:6.0.0'
+    testImplementation 'junit:junit:4.12'
+
+}
+jacocoTestReport {
+    dependsOn test  // report is generated after tests run
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+test {
+    finalizedBy jacocoTestReport  // generate report after running tests
+}
+sonarqube {
+    properties {
+        property "sonar.projectKey", "my_project"
+        property "sonar.projectName", "tp5"
+        property "sonar.projectVersion", "1.0"
+
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            url 'https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B'
+            credentials {
+                username 'myMavenRepo'
+                password 'test0005'
+            }
+        }
+    }
+
+    publications {
+        maven(MavenPublication) {
+            groupId 'oussa_ma'
+
+            from components.java
+        }
+    }
+}
