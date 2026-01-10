@@ -44,19 +44,29 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            // slackSend color: 'good', message: "Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-            mail to: 'ko_benkhaoua@esi.dz',
-                 subject: "Build Success: ${env.JOB_NAME}",
-                 body: 'The build was successful. Deployed to MyMavenRepo.'
-        }
-        failure {
-            // slackSend color: 'danger', message: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-            mail to: 'ko_benkhaoua@esi.dz',
-                 subject: "Build Failed: ${env.JOB_NAME}",
-                 body: 'The build failed. Check Jenkins logs.'
-        }
-    }
-}
-//fianl
+  post {
+          success {
+              // Send Slack notification for success
+              slackSend(
+                  color: 'good',
+                  message: "✅ Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]\nDetails: ${env.BUILD_URL}"
+              )
+
+              mail to: 'ko_benkhaoua@esi.dz',
+                   subject: "Build Success: ${env.JOB_NAME}",
+                   body: "The build was successful. Deployed to MyMavenRepo. \nCheck logs: ${env.BUILD_URL}"
+          }
+
+          failure {
+              // Send Slack notification for failure
+              slackSend(
+                  color: 'danger',
+                  message: "❌ Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]\nFix it here: ${env.BUILD_URL}"
+              )
+
+              mail to: 'ko_benkhaoua@esi.dz',
+                   subject: "Build Failed: ${env.JOB_NAME}",
+                   body: "The build failed. Check Jenkins logs at: ${env.BUILD_URL}"
+          }
+      }
+//final version
