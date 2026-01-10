@@ -1,77 +1,38 @@
 plugins {
     id 'java'
-//    id "com.github.spacialcircumstances.gradle-cucumber-reporting" version "0.1.25"
-    id "jacoco"
-    id "org.sonarqube" version "4.4.1.3373"
+    id 'jacoco'
     id 'maven-publish'
+    id 'org.sonarqube' version '3.5.0.2730'
 }
 
 group = 'com.example'
-version = '1.0-SNAPSHOT'
+version = '1.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
 repositories {
     mavenCentral()
 }
 
-// Force junit to the fixed version to avoid transitive vulnerable version warnings
-configurations.configureEach {
-    resolutionStrategy {
-        force 'junit:junit:4.13.2'
-    }
-}
-
 dependencies {
     testImplementation 'io.cucumber:cucumber-java:6.10.4'
-    // exclude transitive junit carrier to ensure we control the exact JUnit version
-    testImplementation('io.cucumber:cucumber-junit:6.10.4') {
-        exclude group: 'junit', module: 'junit'
-    }
-    // Bump JUnit to a newer patched version
+    testImplementation 'io.cucumber:cucumber-junit:6.10.4'
     testImplementation 'junit:junit:4.13.2'
-
-}
-jacocoTestReport {
-    dependsOn test  // report is generated after tests run
-
-    reports {
-        // use the current Gradle API which exposes a Property on 'required'
-        xml.required.set(true)
-        html.required.set(true)
-        csv.required.set(false)
-    }
 }
 
 test {
-    // Ensure Gradle uses the JUnit 4 runner (Cucumber uses @RunWith(Cucumber.class))
     useJUnit()
-
-    // Generate JUnit XML and HTML test reports useful for Jenkins
-    reports {
-        // use the newer 'required' property to control report generation
-        junitXml.required.set(true)
-        html.required.set(true)
-    }
-
-    // Better test logging for CI
-    testLogging {
-        events "passed", "skipped", "failed"
-        exceptionFormat "short"
-        showStandardStreams = false
-    }
-
-    // Ensure Cucumber (which uses a JUnit runner here) can write its reports
-    // If you prefer to configure the output from the runner class, edit the CucumberOptions there.
-
-    finalizedBy jacocoTestReport  // generate report after running tests
+    systemProperty 'cucumber.plugin', 'pretty, html:build/reports/cucumber/cucumber.html, json:build/reports/cucumber/cucumber.json'
+    finalizedBy jacocoTestReport
 }
-sonarqube {
-    properties {
-        property "sonar.projectKey", "my_project"
-        property "sonar.projectName", "tp5"
-        property "sonar.projectVersion", "1.0"
-        // avoid implicit compilation warning
-        property "sonar.gradle.skipCompile", "true"
 
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
     }
 }
 

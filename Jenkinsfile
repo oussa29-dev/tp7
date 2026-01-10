@@ -1,43 +1,61 @@
 pipeline {
     agent any
+
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Test') {
-            agent any
             steps {
-                script {
-                    if (isUnix()) {
-                        sh './gradlew clean test jacocoTestReport'
-                    } else {
-                        bat '.\\gradlew.bat clean test jacocoTestReport'
-                    }
-                }
+                bat 'gradlew test'
             }
             post {
                 always {
-                    // Publish JUnit results
-                    junit 'build/test-results/**/*.xml'
-                    // Archive raw reports (Cucumber JSON, HTML reports and JaCoCo)
-                    archiveArtifacts artifacts: 'build/reports/cucumber/**, build/reports/tests/**, build/reports/jacoco/**', allowEmptyArchive: true
-                    // Optionally publish HTML reports if publishHTML plugin is installed
-                    publishHTML(target: [
-                        reportDir: 'build/reports/jacoco/test/html',
-                        reportFiles: 'index.html',
-                        reportName: 'JaCoCo Coverage',
-                        allowMissing: true
-                    ])
-                    publishHTML(target: [
-                        reportDir: 'build/reports/tests/test',
-                        reportFiles: 'index.html',
-                        reportName: 'Test Results',
-                        allowMissing: true
-                    ])
+                    junit 'build/test-results/test/*.xml'
+                    cucumber buildStatus: 'unstable', jsonReportDirectory: 'build/reports/cucumber', fileIncludePattern: '*.json'
                 }
             }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    bat 'gradlew sonarqube'
+                }
+            }
+        }
+
+        stage('Code Quality') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'gradlew assemble javadoc'
+                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                bat 'gradlew publish'
+            }
+        }
+    }
+
+    post {
+        success {
+            // slackSend color: 'good', message: "Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+            mail to: 'ma_azzouz@esi.dz',
+                 subject: "Build Success: ${env.JOB_NAME}",
+                 body: 'The build was successful. Deployed to MyMavenRepo.'
+        }
+        failure {
+            // slackSend color: 'danger', message: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
+            mail to: 'ma_azzouz@esi.dz',
+                 subject: "Build Failed: ${env.JOB_NAME}",
+                 body: 'The build failed. Check Jenkins logs.'
         }
     }
 }
