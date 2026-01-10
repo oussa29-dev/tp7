@@ -36,22 +36,22 @@ jacocoTestReport {
     }
 }
 
-//publishing {
-//    repositories {
-//        maven {
-//            url 'https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B'
-//            credentials {
-//                username 'myMavenRepo'
-//                password 'test0005'
-//            }
-//        }
-//    }
-//
-//    publications {
-//        maven(MavenPublication) {
-//            groupId 'oussa_ma'
-//
-//            from components.java
-//        }
-//    }
-//}
+publishing {
+    repositories {
+        maven {
+            url 'https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B'
+            credentials {
+                username 'myMavenRepo'
+                password 'test0005'
+            }
+        }
+    }
+
+    publications {
+        maven(MavenPublication) {
+            groupId 'oussa_ma'
+
+            from components.java
+        }
+    }
+}

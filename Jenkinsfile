@@ -14,13 +14,13 @@ pipeline {
             }
         }
 
-//         stage('Code Analysis') {
-//             steps {
-//                 withSonarQubeEnv('sonar') {
-//                     bat 'gradlew sonarqube'
-//                 }
-//             }
-//         }
+        stage('Code Analysis') {
+            steps {
+                withSonarQubeEnv('sonar') {
+                    bat 'gradlew sonarqube'
+                }
+            }
+        }
 
         stage('Code Quality') {
             steps {
