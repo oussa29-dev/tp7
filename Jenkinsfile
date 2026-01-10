@@ -69,4 +69,5 @@ pipeline {
                    body: "The build failed. Check Jenkins logs at: ${env.BUILD_URL}"
           }
       }
+}
 //final version
