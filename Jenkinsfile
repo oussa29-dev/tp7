@@ -14,13 +14,13 @@ pipeline {
             }
         }
 
-        stage('Code Analysis') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    bat 'gradlew sonarqube'
-                }
-            }
-        }
+//         stage('Code Analysis') {
+//             steps {
+//                 withSonarQubeEnv('sonar') {
+//                     bat 'gradlew sonarqube'
+//                 }
+//             }
+//         }
 
         stage('Code Quality') {
             steps {
@@ -47,13 +47,13 @@ pipeline {
     post {
         success {
             // slackSend color: 'good', message: "Build Success: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-            mail to: 'ma_azzouz@esi.dz',
+            mail to: 'ko_benkhaoua@esi.dz',
                  subject: "Build Success: ${env.JOB_NAME}",
                  body: 'The build was successful. Deployed to MyMavenRepo.'
         }
         failure {
             // slackSend color: 'danger', message: "Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]"
-            mail to: 'ma_azzouz@esi.dz',
+            mail to: 'ko_benkhaoua@esi.dz',
                  subject: "Build Failed: ${env.JOB_NAME}",
                  body: 'The build failed. Check Jenkins logs.'
         }
