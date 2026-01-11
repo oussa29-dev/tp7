@@ -21,7 +21,7 @@ pipeline {
                 }
             }
         }
-//
+// Wait for SonarQube analysis to be completed and get the quality gate status
         stage('Code Quality') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
