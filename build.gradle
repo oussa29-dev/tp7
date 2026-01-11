@@ -42,7 +42,7 @@ publishing {
             url 'https://mymavenrepo.com/repo/cEmjfkxugPlzLxXg1A2B'
             credentials {
                 username 'myMavenRepo'
-                password '11114567'
+                password 'test0005'
                }
         }
     }
